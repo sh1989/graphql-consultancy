@@ -1,17 +1,22 @@
-import { getProject } from './api';
+import { getCompetenciesForDeveloper, getProjectAssignment } from './api';
+import { toRole } from './role';
 
 class Developer {
-  constructor(id, name, competencies, role, projectId) {
+  constructor(id, name, role) {
     this.id = id;
     this.name = name;
-    this.competencies = competencies;
-    this.role = role;
-    this.projectId = projectId;
+    this.role = toRole(role);
   }
 
-  project() {
+  competencies(obj, ctx) {
     return new Promise(resolve => {
-      resolve(getProject(this.projectId));
+      resolve(getCompetenciesForDeveloper(this.id, ctx));
+    });
+  }
+
+  project(obj, ctx) {
+    return new Promise(resolve => {
+      resolve(getProjectAssignment(this.id, ctx));
     });
   }
 }

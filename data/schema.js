@@ -32,6 +32,6 @@ export const schema = buildSchema(`
 `);
 
 export const rootValue = {
-  developers: () => getDevelopers(),
-  projects: () => getProjects()
+  developers: (obj, ctx) => getDevelopers(ctx),
+  projects: (obj, ctx) => getProjects(ctx)
 };

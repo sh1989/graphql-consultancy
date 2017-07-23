@@ -15,7 +15,8 @@
     "babel-preset-stage-0": "^6.24.1",
     "express": "^4.15.3",
     "express-graphql": "^0.6.6",
-    "graphql": "^0.10.1"
+    "graphql": "^0.10.1",
+    "sqlite": "^2.8.0"
   },
   "devDependencies": {
     "babel-cli": "^6.24.1"
