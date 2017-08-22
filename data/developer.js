@@ -8,16 +8,12 @@ class Developer {
     this.role = toRole(role);
   }
 
-  competencies(obj, ctx) {
-    return new Promise(resolve => {
-      resolve(getCompetenciesForDeveloper(this.id, ctx));
-    });
+  competencies({ top }, ctx) {
+    return getCompetenciesForDeveloper(this.id, ctx, top);
   }
 
   project(obj, ctx) {
-    return new Promise(resolve => {
-      resolve(getProjectAssignment(this.id, ctx));
-    });
+    return getProjectAssignment(this.id, ctx);
   }
 }
 

@@ -1,5 +1,7 @@
 import { buildSchema } from 'graphql';
-import { getDevelopers, getProjects } from './api';
+import {
+  getDeveloper, getDevelopers, getProject, getProjects, getSkills
+} from './api';
 
 export const schema = buildSchema(`
   type Project {
@@ -16,7 +18,7 @@ export const schema = buildSchema(`
   type Developer {
     id: String!,
     name: String,
-    competencies: [Competency],
+    competencies(top: Int): [Competency],
     role: Role,
     project: Project
   }
@@ -25,13 +27,28 @@ export const schema = buildSchema(`
     GRAD, DEV, SENIOR, LEAD
   }
 
+  type Skill {
+    id: String!,
+    name: String
+  }
+
+  enum Order {
+    ASCENDING, DESCENDING
+  }
+
   type Query {
-    developers: [Developer],
-    projects: [Project]
+    developer(id: String!): Developer,
+    developers(assigned: Boolean): [Developer],
+    project(id: String!): Project
+    projects: [Project],
+    skills(order: Order = ASCENDING) : [Skill]
   }
 `);
 
 export const rootValue = {
-  developers: (obj, ctx) => getDevelopers(ctx),
-  projects: (obj, ctx) => getProjects(ctx)
+  developer: ({ id }, ctx) => getDeveloper(ctx, id),
+  developers: ({ assigned }, ctx) => getDevelopers(ctx, assigned),
+  project: ({ id }, ctx) => getProject(ctx, id),
+  projects: (obj, ctx) => getProjects(ctx),
+  skills: ({ order }, ctx) => getSkills(ctx, order)
 };
