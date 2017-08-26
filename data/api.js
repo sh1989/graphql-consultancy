@@ -39,6 +39,12 @@ export const getProjectAssignment = (id, ctx) =>
   );
 
 /* SKILLS AND COMPETENCIES */
+export const getSkill = (ctx, id) =>
+  ctx.db.get('SELECT id, name FROM skill WHERE id = $id', { $id: id })
+  .then(result => result ?
+    new Skill(result.id, result.name) :
+    new Error(`No skill exists with id ${id}`));
+
 export const getSkills = (ctx, order) =>
   ctx.db.all(`SELECT id, name FROM skill ORDER BY name ${order === 'DESCENDING' ? 'DESC' : 'ASC'}`)
   .then(result => result.map(r => new Skill(r.id, r.name)));

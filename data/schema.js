@@ -1,6 +1,6 @@
 import { buildSchema } from 'graphql';
 import {
-  getDeveloper, getDevelopers, getProject, getProjects, getSkills
+  getDeveloper, getDevelopers, getProject, getProjects, getSkill, getSkills
 } from './api';
 
 export const schema = buildSchema(`
@@ -41,6 +41,7 @@ export const schema = buildSchema(`
     developers(assigned: Boolean): [Developer],
     project(id: String!): Project
     projects: [Project],
+    skill(id: String!) : Skill
     skills(order: Order = ASCENDING) : [Skill]
   }
 `);
@@ -50,5 +51,6 @@ export const rootValue = {
   developers: ({ assigned }, ctx) => getDevelopers(ctx, assigned),
   project: ({ id }, ctx) => getProject(ctx, id),
   projects: (obj, ctx) => getProjects(ctx),
+  skill: ({ id }, ctx) => getSkill(ctx, id),
   skills: ({ order }, ctx) => getSkills(ctx, order)
 };
