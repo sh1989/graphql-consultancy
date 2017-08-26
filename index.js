@@ -5,7 +5,7 @@ const { schema, rootValue } = require('./data/schema');
 
 const GRAPHQL_PORT = 8080;
 
-sqlite.open(':memory:', { cached: true })
+sqlite.open('consultancy.db', { cached: true })
   .then(() => sqlite.run('PRAGMA foreign_keys=on'))
   .then(() => sqlite.migrate())
   .then(() => {
