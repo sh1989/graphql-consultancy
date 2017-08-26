@@ -3,6 +3,7 @@ import Developer from './developer';
 import Project from './project';
 import Skill from './skill';
 
+/* DEVELOPER */
 export const getDeveloper = (ctx, id) =>
   ctx.db.get('SELECT id, name, role FROM developer WHERE id = $id', { $id: id })
   .then(result => result ?
@@ -19,6 +20,7 @@ export const getDevelopers = (ctx, assigned) => {
   .then(result => result.map(r => new Developer(r.id, r.name, r.role)));
 };
 
+/* PROJECTS AND ASSIGNMENTS */
 export const getProject = (ctx, id) =>
   ctx.db.get('SELECT id, name, description FROM project WHERE id = $id', { $id: id })
   .then(result => result ?
@@ -31,7 +33,15 @@ export const getProjects = ctx =>
 
 export const getProjectAssignment = (id, ctx) =>
   ctx.db.get('SELECT a.projectId, p.name, p.description FROM assignments a LEFT JOIN project p ON (p.id = a.projectId) WHERE a.developerId = $id', { $id: id })
-  .then(result => new Project(result.projectId, result.name, result.description));
+  .then(result => result ?
+    new Project(result.projectId, result.name, result.description) :
+    null
+  );
+
+/* SKILLS AND COMPETENCIES */
+export const getSkills = (ctx, order) =>
+  ctx.db.all(`SELECT id, name FROM skill ORDER BY name ${order === 'DESCENDING' ? 'DESC' : 'ASC'}`)
+  .then(result => result.map(r => new Skill(r.id, r.name)));
 
 export const getCompetenciesForDeveloper = (id, ctx, top) => {
   if (top < 0) {
@@ -44,6 +54,3 @@ export const getCompetenciesForDeveloper = (id, ctx, top) => {
     .then(result => result.map(r => new Competency(r.name, r.value)));
 };
 
-export const getSkills = (ctx, order) =>
-  ctx.db.all(`SELECT id, name FROM skill ORDER BY name ${order === 'DESCENDING' ? 'DESC' : 'ASC'}`)
-  .then(result => result.map(r => new Skill(r.id, r.name)));
