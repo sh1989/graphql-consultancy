@@ -1,5 +1,8 @@
 import { buildSchema } from 'graphql';
 import {
+  createDeveloper, createProject, createSkill,
+  removeDeveloper, removeProject,
+  editRole, setProject, setCompetency,
   getDeveloper, getDevelopers, getProject, getProjects, getSkill, getSkills
 } from './api';
 
@@ -36,6 +39,44 @@ export const schema = buildSchema(`
     ASCENDING, DESCENDING
   }
 
+  input DeveloperInput {
+    name: String!,
+    role: Role!
+  }
+
+  input DeleteDeveloperInput {
+    id: String!
+  }
+
+  input ProjectInput {
+    name: String!,
+    description: String!
+  }
+
+  input DeleteProjectInput {
+    id: String!
+  }
+
+  input SkillInput {
+    name: String!
+  }
+
+  input AssignCompetencyInput {
+    developer: String!,
+    skill: String!,
+    rating: Int!
+  }
+
+  input AssignProjectInput {
+    developer: String!,
+    project: String!
+  }
+
+  input AssignRoleInput {
+    developer: String!,
+    role: Role!
+  }
+
   type Query {
     developer(id: String!): Developer,
     developers(assigned: Boolean): [Developer],
@@ -43,6 +84,17 @@ export const schema = buildSchema(`
     projects: [Project],
     skill(id: String!) : Skill
     skills(order: Order = ASCENDING) : [Skill]
+  }
+
+  type Mutation {
+    addDeveloper(input: DeveloperInput!) : Developer,
+    deleteDeveloper(input: DeleteDeveloperInput!) : String,
+    addProject(input: ProjectInput!) : Project,
+    deleteProject(input: DeleteProjectInput!) : String,
+    addSkill(input: SkillInput!) : Skill,
+    assignCompetency(input: AssignCompetencyInput!) : Developer,
+    assignProject(input: AssignProjectInput!) : Developer,
+    assignRole(input: AssignRoleInput!) : Developer
   }
 `);
 
@@ -52,5 +104,13 @@ export const rootValue = {
   project: ({ id }, ctx) => getProject(ctx, id),
   projects: (obj, ctx) => getProjects(ctx),
   skill: ({ id }, ctx) => getSkill(ctx, id),
-  skills: ({ order }, ctx) => getSkills(ctx, order)
+  skills: ({ order }, ctx) => getSkills(ctx, order),
+  addDeveloper: ({ input }, ctx) => createDeveloper(ctx, input),
+  deleteDeveloper: ({ input }, ctx) => removeDeveloper(ctx, input),
+  addProject: ({ input }, ctx) => createProject(ctx, input),
+  deleteProject: ({ input }, ctx) => removeProject(ctx, input),
+  addSkill: ({ input }, ctx) => createSkill(ctx, input),
+  assignCompetency: ({ input }, ctx) => setCompetency(ctx, input),
+  assignProject: ({ input }, ctx) => setProject(ctx, input),
+  assignRole: ({ input }, ctx) => editRole(ctx, input)
 };
