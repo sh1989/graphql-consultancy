@@ -7,18 +7,26 @@ import {
 } from './api';
 
 export const schema = buildSchema(`
-  type Project {
+  interface Named {
+    id: String!,
+    name: String
+  }
+
+  # A contracted order of work
+  type Project implements Named {
     id: String!,
     name: String,
     description: String
   }
 
+  # A quantified piece of knowledge
   type Competency {
     name: String,
     rating: Int
   }
 
-  type Developer {
+  # An employee who performs software development
+  type Developer implements Named {
     id: String!,
     name: String,
     competencies(top: Int): [Competency],
@@ -26,15 +34,18 @@ export const schema = buildSchema(`
     project: Project
   }
 
+  # A position within the company
   enum Role {
-    GRAD, DEV, SENIOR, LEAD
+    GRAD, JUNIOR, SENIOR, LEAD
   }
 
-  type Skill {
+  # A category of knowledge
+  type Skill implements Named {
     id: String!,
     name: String
   }
 
+  # An alphabetical ordering direction
   enum Order {
     ASCENDING, DESCENDING
   }
@@ -95,6 +106,11 @@ export const schema = buildSchema(`
     assignCompetency(input: AssignCompetencyInput!) : Developer,
     assignProject(input: AssignProjectInput!) : Developer,
     assignRole(input: AssignRoleInput!) : Developer
+  }
+
+  type Schema {
+    query: Query,
+    mutation: Mutation
   }
 `);
 
