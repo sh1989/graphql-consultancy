@@ -1,0 +1,23 @@
+fragment Details on Named {
+  id
+  name
+}
+
+query AnAssortment($sam: String!, $gary: String!, $website: String!) {
+  sam: developer(id: $sam) {
+    ...Details
+  }
+  gary: developer(id: $gary) {
+    ...Details
+  }
+  website: project(id: $website) {
+    ...Details
+    description
+  }
+}
+
+{
+  "sam": "1",
+  "gary": "2",
+  "website": "5"
+}

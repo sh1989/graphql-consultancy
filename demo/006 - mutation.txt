@@ -1,0 +1,18 @@
+mutation {
+  addDeveloper(input: {
+    name: "Cleo",
+    role: GRAD
+  }) {
+    id,
+    name,
+    role,
+    competencies {
+      name,
+      rating
+    },
+    project {
+      name,
+      description
+    }
+  }
+}

@@ -1,0 +1,17 @@
+{
+  developers {
+    id,
+    name,
+    role,
+    competencies {
+      name,
+      rating
+    },
+    project {
+      id,
+      name,
+      description
+    }
+    
+  }
+}

@@ -1,0 +1,17 @@
+fragment Details on Named {
+  id,
+  name
+}
+
+{
+  sam: developer(id: "1") {
+    ...Details
+  },
+  gary: developer(id: "2") {
+    ...Details
+  },
+  website: project(id: "5") {
+    ...Details,
+    description
+  }
+}

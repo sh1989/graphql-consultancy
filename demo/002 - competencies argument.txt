@@ -1,0 +1,9 @@
+{
+  developers {
+    name,
+    competencies(top: 4) {
+      name,
+      rating
+    }
+  }
+}
