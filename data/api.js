@@ -4,21 +4,41 @@ import Project from './project';
 import Skill from './skill';
 import { fromRole } from './role';
 
+const whereIdsIn = (db, selection, ids, responseTransformer, errorMessage) =>
+  db.all(
+    `${selection} (${ids.map(() => '?').join()})`,
+    ids
+  ).then(rows => ids.map(
+    id => {
+      const entry = rows.find(row => row.id && row.id.toString() === id);
+      return entry ? responseTransformer(entry) : new Error(`${errorMessage} ${id}`)
+    }
+  ));
+
+
 /* DEVELOPER */
 export const getDeveloper = (ctx, id) =>
   ctx.db.get('SELECT id, name, role FROM developer WHERE id = $id', { $id: id })
   .then(result => result ?
-      new Developer(result.id, result.name, result.role) :
+      new Developer(result.id.toString(), result.name, result.role) :
       new Error(`No developer exists with id ${id}`));
 
-export const getDevelopers = (ctx, assigned) => {
+export const getDevelopers = (ids, db) => whereIdsIn(
+  db,
+  'SELECT id, name, role FROM developer WHERE id IN',
+  ids,
+  e => new Developer(e.id.toString(), e.name, e.role),
+  'No developer exists with id'
+);
+
+export const getAllDevelopers = (ctx, assigned) => {
   const subquery = assigned === undefined ?
     '' :
     `${assigned ? 'WHERE' : 'WHERE NOT'} EXISTS (SELECT a.developerId FROM assignments a WHERE a.developerId = d.id)`;
   const query = `SELECT d.id, d.name, d.role FROM developer d ${subquery}`;
 
   return ctx.db.all(query)
-  .then(result => result.map(r => new Developer(r.id, r.name, r.role)));
+  .then(result => result.map(r => new Developer(r.id.toString(), r.name, r.role)));
 };
 
 export const createDeveloper = (ctx, developer) =>
@@ -43,12 +63,20 @@ export const editRole = (ctx, roleChange) =>
 export const getProject = (ctx, id) =>
   ctx.db.get('SELECT id, name, description FROM project WHERE id = $id', { $id: id })
   .then(result => result ?
-    new Project(result.id, result.name, result.description) :
+    new Project(result.id.toString(), result.name, result.description) :
     new Error(`No project exists with id ${id}`));
 
-export const getProjects = ctx =>
+export const getProjects = (ids, db) => whereIdsIn(
+  db,
+  'SELECT id, name, description FROM project WHERE id IN',
+  ids,
+  e => new Project(e.id.toString(), e.name, e.description),
+  'No project exists with id'
+);
+
+export const getAllProjects = ctx =>
   ctx.db.all('SELECT id, name, description FROM project')
-  .then(result => result.map(r => new Project(r.id, r.name, r.description)));
+  .then(result => result.map(r => new Project(r.id.toString(), r.name, r.description)));
 
 export const createProject = (ctx, project) =>
   ctx.db.run('INSERT INTO project (name, description) VALUES (?, ?)', project.name, project.description)
@@ -62,12 +90,19 @@ export const removeProject = (ctx, { id }) =>
     id :
     new Error(`Unable to delete project with id ${id}`));
 
-export const getProjectAssignment = (id, ctx) =>
-  ctx.db.get('SELECT a.projectId, p.name, p.description FROM assignments a LEFT JOIN project p ON (p.id = a.projectId) WHERE a.developerId = $id', { $id: id })
-  .then(result => result ?
-    new Project(result.projectId, result.name, result.description) :
-    null
-  );
+export const getProjectAssignments = (ids, db) => whereIdsIn(
+  db,
+  `SELECT d.id, p.id as projectId, p.name, p.description
+  FROM developer d
+  LEFT JOIN assignments a
+  ON (d.id = a.developerId)
+  LEFT JOIN project p
+  ON (p.id = a.projectId)
+  WHERE d.id IN`,
+  ids,
+  e => e.projectId ? new Project(e.projectId.toString(), e.name, e.description) : null,
+  'No Developer exists with id'
+);
 
 export const setProject = (ctx, assignment) =>
   ctx.db.run('INSERT OR REPLACE INTO assignments (developerId, projectId) VALUES (?, ?)', assignment.developer, assignment.project)
@@ -76,13 +111,15 @@ export const setProject = (ctx, assignment) =>
     new Error(`Unable to assign developer ${assignment.developer} to project ${assignment.project}`));
 
 /* SKILLS AND COMPETENCIES */
-export const getSkill = (ctx, id) =>
-  ctx.db.get('SELECT id, name FROM skill WHERE id = $id', { $id: id })
-  .then(result => result ?
-    new Skill(result.id, result.name) :
-    new Error(`No skill exists with id ${id}`));
+export const getSkills = (ids, db) => whereIdsIn(
+  db,
+  'SELECT id, name FROM skill WHERE id IN',
+  ids,
+  e => new Skill(e.id.toString(), e.name),
+  'No skill exists with id'
+);
 
-export const getSkills = (ctx, order) =>
+export const getAllSkills = (ctx, order) =>
   ctx.db.all(`SELECT id, name FROM skill ORDER BY name ${order === 'DESCENDING' ? 'DESC' : 'ASC'}`)
   .then(result => result.map(r => new Skill(r.id, r.name)));
 

@@ -1,4 +1,4 @@
-import { getCompetenciesForDeveloper, getProjectAssignment } from './api';
+import { getCompetenciesForDeveloper } from './api';
 import { toRole } from './role';
 
 class Developer {
@@ -13,7 +13,7 @@ class Developer {
   }
 
   project(obj, ctx) {
-    return getProjectAssignment(this.id, ctx);
+    return ctx.loaders.projectAssignments.load(this.id);
   }
 }
 

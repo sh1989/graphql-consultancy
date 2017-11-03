@@ -3,7 +3,7 @@ import {
   createDeveloper, createProject, createSkill,
   removeDeveloper, removeProject,
   editRole, setProject, setCompetency,
-  getDeveloper, getDevelopers, getProject, getProjects, getSkill, getSkills
+  getAllDevelopers, getAllProjects, getAllSkills
 } from './api';
 
 export const schema = buildSchema(`
@@ -115,12 +115,12 @@ export const schema = buildSchema(`
 `);
 
 export const rootValue = {
-  developer: ({ id }, ctx) => getDeveloper(ctx, id),
-  developers: ({ assigned }, ctx) => getDevelopers(ctx, assigned),
-  project: ({ id }, ctx) => getProject(ctx, id),
-  projects: (obj, ctx) => getProjects(ctx),
-  skill: ({ id }, ctx) => getSkill(ctx, id),
-  skills: ({ order }, ctx) => getSkills(ctx, order),
+  developer: ({ id }, ctx) => ctx.loaders.developers.load(id),
+  developers: ({ assigned }, ctx) => getAllDevelopers(ctx, assigned),
+  project: ({ id }, ctx) => ctx.loaders.projects.load(id),
+  projects: (obj, ctx) => getAllProjects(ctx),
+  skill: ({ id }, ctx) => ctx.loaders.skills.load(id),
+  skills: ({ order }, ctx) => getAllSkills(ctx, order),
   addDeveloper: ({ input }, ctx) => createDeveloper(ctx, input),
   deleteDeveloper: ({ input }, ctx) => removeDeveloper(ctx, input),
   addProject: ({ input }, ctx) => createProject(ctx, input),
