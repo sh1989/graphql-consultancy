@@ -1,0 +1,15 @@
+query {
+  sam: developer(id: "2") {
+    competencies(top: 3) {
+      name, rating
+    }
+  },
+  gary: developer(id: "3") {
+    competencies(top: 4) {
+      name, rating
+    }
+  },
+  dustin: developer(id: "19") {
+    name
+  }
+}
